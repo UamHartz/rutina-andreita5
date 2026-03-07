@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andreita Gym</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 1rem;
+            max-width: 100%;
+        }
+        .day-card {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 1rem;
+        }
+        .day-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            border-color: #444;
+        }
+        .exercise-item {
+            transition: all 0.2s ease;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #333;
+        }
+        .exercise-item:hover {
+            background-color: rgba(255,255,255,0.05);
+            transform: translateX(3px);
+            border-color: #555;
+        }
+        .rest-day {
+            background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+            border: 1px solid #333;
+        }
+        .workout-day {
+            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+            border: 1px solid #333;
+        }
+        .muscle-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .gluteo { background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #000; border-color: #ff6b35; }
+        .pierna { background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: #fff; border-color: #4a90e2; }
+        .abs { background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%); color: #fff; border-color: #e91e63; }
+        .biceps { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); color: #fff; border-color: #4caf50; }
+        .triceps { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: #000; border-color: #ff9800; }
+        .hombro { background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%); color: #fff; border-color: #9c27b0; }
+        .pecho { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); color: #fff; border-color: #f44336; }
+        .espalda { background: linear-gradient(135deg, #009688 0%, #00796b 100%); color: #fff; border-color: #009688; }
+        .cardio { background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #000; border-color: #ff6b35; }
+        
+        .day-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            font-size: 0.75rem;
+            padding: 0.5rem 0.75rem;
+        }
+        .day-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        .day-btn.active {
+            background: rgba(255,255,255,0.25);
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        
+        h1, h2, h3 {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .exercise-li {
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+        .exercise-li:hover {
+            background: rgba(255,255,255,0.05);
+            border-left-color: #666;
+        }
+        
+        .nav-button {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+        }
+        .nav-button:hover:not(:disabled) {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+        .nav-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .arrow-nav {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #333;
+            backdrop-filter: blur(10px);
+        }
+        .arrow-nav:hover:not(:disabled) {
+            background: rgba(0,0,0,0.9);
+            border-color: #555;
+            transform: scale(1.1);
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                padding: 1rem;
+                max-width: 768px;
+                margin: 0 auto;
+            }
+            .day-card {
+                margin-bottom: 1.5rem;
+            }
+            .day-btn {
+                font-size: 0.875rem;
+                padding: 0.75rem 1rem;
+            }
+            .nav-button {
+                font-size: 0.875rem;
+                padding: 0.75rem 1rem;
+            }
+            .exercise-li {
+                font-size: 0.875rem;
+                padding: 0.75rem;
+            }
+            .muscle-badge {
+                font-size: 0.875rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 1024px;
+            }
+            .day-card {
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body class="m-0 p-0">
+    <div class="container">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <div class="mb-3">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-gray-800 to-black rounded-full mb-3">
+                    <i class="fas fa-dumbbell text-2xl text-white"></i>
+                </div>
+            </div>
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 tracking-tight">
+                Andreita Gym
+            </h1>
+            <p class="text-lg md:text-xl text-gray-300 font-light">Chica Seria 💪</p>
+            <div class="mt-4 flex justify-center space-x-4 md:space-x-6">
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-bold text-white">7</div>
+                    <div class="text-xs md:text-sm text-gray-400 uppercase tracking-wider">Días</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-bold text-white">5</div>
+                    <div class="text-xs md:text-sm text-gray-400 uppercase tracking-wider">Entrenos</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-bold text-white">2</div>
+                    <div class="text-xs md:text-sm text-gray-400 uppercase tracking-wider">Descanso</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Day Selector -->
+        <div class="text-center mb-6">
+            <div class="inline-flex rounded-lg bg-black bg-opacity-50 backdrop-blur-xl p-1 border border-gray-700 flex-wrap justify-center">
+                <button onclick="showDay('lunes')" class="day-btn px-3 py-2 rounded-lg text-white font-semibold transition-all text-xs uppercase tracking-wider" data-day="lunes">Lun</button>
+                <button onclick="showDay('martes')" class="day-btn px-3 py-2 rounded-lg text-white font-semibold transition-all text-xs uppercase tracking-wider" data-day="martes">Mar</button>
+                <button onclick="showDay('miercoles')" class="day-btn px-3 py-2 rounded-lg text-white font-semibold transition-all text-xs uppercase tracking-wider" data-day="miercoles">Mie</button>
+                <button onclick="showDay('jueves')" class="day-btn px-3 py-2 rounded-lg text-white font-semibold transition-all text-xs uppercase tracking-wider" data-day="jueves">Jue</button>
+                <button onclick="showDay('viernes')" class="day-btn px-3 py-2 rounded-lg text-white font-semibold transition-all text-xs uppercase tracking-wider" data-day="viernes">Vie</button>
+                <button onclick="showDay('sabado')" class="day-btn px-3 py-2 rounded-lg text-white font-semibold transition-all text-xs uppercase tracking-wider" data-day="sabado">Sab</button>
+                <button onclick="showDay('domingo')" class="day-btn px-3 py-2 rounded-lg text-white font-semibold transition-all text-xs uppercase tracking-wider" data-day="domingo">Dom</button>
+            </div>
+        </div>
+
+        <!-- Current Day Display -->
+        <div id="currentDayDisplay" class="max-w-2xl mx-auto">
+            <!-- Days will be shown here dynamically -->
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-12 text-gray-400 border-t border-gray-800 pt-8">
+            <div class="mb-4">
+                <div class="inline-flex items-center space-x-2">
+                    <i class="fas fa-fire text-orange-500"></i>
+                    <span class="text-sm uppercase tracking-wider">Elite Performance</span>
+                    <i class="fas fa-fire text-orange-500"></i>
+                </div>
+            </div>
+            <p class="text-xs opacity-60">
+                © 2024 Andreita Gym - Professional Training System
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Day data
+        const dayData = {
+            lunes: {
+                name: 'Lunes',
+                icon: 'fa-fire',
+                iconColor: 'text-orange-500',
+                type: 'workout',
+                muscles: [
+                    { name: 'Glúteo', class: 'gluteo', exercises: [
+                        'Hip thrust 10x4',
+                        'Peso muerto',
+                        'Prensa 10x4',
+                        'Búlgaras (pierna levantada) 10x4',
+                        'Step up lateral',
+                        'Polea/patada 10-12x4',
+                        'Polea de lado',
+                        '10/10x2'
+                    ]},
+                    { name: 'Pierna', class: 'pierna', exercises: [
+                        'Sentadillas con barra',
+                        'Extensión de cuádriceps 12x3',
+                        'Femoral sentada',
+                        'Aductores 8-10x3',
+                        'Gemelos'
+                    ]},
+                    { name: 'Abs', class: 'abs', exercises: [
+                        'Abs cortos 1min',
+                        'Plancha 1min',
+                        'Cucaracha 1min',
+                        'Descanso 1min',
+                        'Piernas arriba y abajo 1min',
+                        'Piernas de lado a lado',
+                        'Toe touches 1min',
+                        '1min con piernas un poco levantadas',
+                        '1min descanso',
+                        'Abs cortos (laterales) 1min',
+                        'Tocar puntas pies levantados 1min',
+                        'Plancha de lado a lado 1min',
+                        '1min descanso (todo x2)'
+                    ]}
+                ]
+            },
+            martes: {
+                name: 'Martes',
+                icon: 'fa-fire',
+                iconColor: 'text-orange-500',
+                type: 'workout',
+                muscles: [
+                    { name: 'Bíceps/Tríceps/Hombro', class: 'biceps', exercises: [
+                        'Jalón al pecho 12x4 /20kg',
+                        'Remo 8-10x4 23kg',
+                        'Remo inclinado 8-10x3',
+                        'Bíceps curl 8-10x3',
+                        'Curl martillo 8-10x3',
+                        'Bíceps curl 8-10x3',
+                        'Shoulder press 8-10x3',
+                        'Tirón de tríceps 12x3',
+                        'Tríceps katana 12x3',
+                        'Press francés + mancuerna 12x3',
+                        'Lateral raise 10x3',
+                        'Arm extension 10x3'
+                    ]}
+                ]
+            },
+            miercoles: {
+                name: 'Miércoles',
+                icon: 'fa-fire',
+                iconColor: 'text-orange-500',
+                type: 'workout',
+                muscles: [
+                    { name: 'Pecho/Espalda', class: 'pecho', exercises: [
+                        'Press pecho en banco plano 10x3',
+                        'Press pecho inclinado 10x3',
+                        'Contracciones de pecho 10x3',
+                        'Press pecho en máquina 10x3',
+                        'Press pecho banco 60° 10x3',
+                        'Convergin chest press'
+                    ]},
+                    { name: 'Abs', class: 'abs', exercises: [
+                        'Abs cortos 1min',
+                        'Plancha 1min',
+                        'Cucaracha 1min',
+                        'Descanso 1min',
+                        'Piernas arriba y abajo 1min',
+                        'Piernas de lado a lado',
+                        'Toe touches 1min',
+                        '1min con piernas un poco levantadas',
+                        '1min descanso',
+                        'Abs cortos (laterales) 1min',
+                        'Tocar puntas pies levantados 1min',
+                        'Plancha de lado a lado 1min',
+                        '1min descanso (todo x2)'
+                    ]}
+                ]
+            },
+            jueves: {
+                name: 'Jueves',
+                icon: 'fa-bed',
+                iconColor: 'text-blue-500',
+                type: 'rest'
+            },
+            viernes: {
+                name: 'Viernes',
+                icon: 'fa-fire',
+                iconColor: 'text-orange-500',
+                type: 'workout',
+                muscles: [
+                    { name: 'Glúteo', class: 'gluteo', exercises: [
+                        'Hip thrust 10x4',
+                        'Peso muerto',
+                        'Prensa 10x4',
+                        'Búlgaras (pierna levantada) 10x4',
+                        'Step up lateral',
+                        'Polea/patada 10-12x4',
+                        'Polea de lado',
+                        '10/10x2'
+                    ]},
+                    { name: 'Abs', class: 'abs', exercises: [
+                        'Abs cortos 1min',
+                        'Plancha 1min',
+                        'Cucaracha 1min',
+                        'Descanso 1min',
+                        'Piernas arriba y abajo 1min',
+                        'Piernas de lado a lado',
+                        'Toe touches 1min',
+                        '1min con piernas un poco levantadas',
+                        '1min descanso',
+                        'Abs cortos (laterales) 1min',
+                        'Tocar puntas pies levantados 1min',
+                        'Plancha de lado a lado 1min',
+                        '1min descanso (todo x2)'
+                    ]}
+                ]
+            },
+            sabado: {
+                name: 'Sábado',
+                icon: 'fa-bed',
+                iconColor: 'text-blue-500',
+                type: 'rest'
+            },
+            domingo: {
+                name: 'Domingo',
+                icon: 'fa-running',
+                iconColor: 'text-green-500',
+                type: 'workout',
+                muscles: [
+                    { name: 'Espalda y Cardio', class: 'espalda', exercises: [
+                        'Ejercicios de espalda',
+                        'Sesión de cardio'
+                    ]}
+                ]
+            }
+        };
+
+        function showDay(dayId, muscleIndex = 0) {
+            const day = dayData[dayId];
+            const display = document.getElementById('currentDayDisplay');
+            
+            // Update button states
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                if (btn.dataset.day === dayId) {
+                    btn.classList.add('bg-white', 'bg-opacity-30');
+                } else {
+                    btn.classList.remove('bg-white', 'bg-opacity-30');
+                }
+            });
+            
+            // Generate day content
+            let content = '';
+            
+            if (day.type === 'rest') {
+                content = `
+                    <div class="day-card rest-day rounded-xl shadow-lg p-4 md:p-6 lg:p-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl md:text-2xl lg:text-3xl font-bold text-white">${day.name}</h2>
+                            <i class="fas ${day.icon} ${day.iconColor} text-xl md:text-2xl lg:text-3xl"></i>
+                        </div>
+                        <div class="text-center py-8 md:py-12">
+                            <i class="fas fa-spa text-6xl md:text-7xl lg:text-8xl text-blue-400 mb-4 md:mb-6"></i>
+                            <h3 class="text-xl md:text-2xl font-semibold text-white mb-2 md:mb-3">Camita 😴</h3>
+                            <p class="text-gray-300 text-sm md:text-lg">Recupera y repara tus músculos</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const currentMuscle = day.muscles[muscleIndex];
+                const totalMuscles = day.muscles.length;
+                
+                // Navigation buttons for multiple muscles
+                let navigation = '';
+                if (totalMuscles > 1) {
+                    navigation = `
+                        <div class="flex items-center justify-between mb-6">
+                            <button onclick="showDay('${dayId}', ${muscleIndex - 1})" 
+                                    class="nav-button px-4 py-2 text-white rounded-lg transition-all ${muscleIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    ${muscleIndex === 0 ? 'disabled' : ''}>
+                                <i class="fas fa-arrow-left mr-2"></i>Anterior
+                            </button>
+                            <div class="text-white font-medium">
+                                ${currentMuscle.name} (${muscleIndex + 1}/${totalMuscles})
+                            </div>
+                            <button onclick="showDay('${dayId}', ${muscleIndex + 1})" 
+                                    class="nav-button px-4 py-2 text-white rounded-lg transition-all ${muscleIndex === totalMuscles - 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    ${muscleIndex === totalMuscles - 1 ? 'disabled' : ''}>
+                                Siguiente<i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                // Arrow navigation for muscles (larger arrows on sides)
+                let arrowNavigation = '';
+                if (totalMuscles > 1) {
+                    arrowNavigation = `
+                        <div class="absolute inset-0 flex items-center justify-between pointer-events-none">
+                            <button onclick="showDay('${dayId}', ${muscleIndex - 1})" 
+                                    class="pointer-events-auto ml-4 p-3 arrow-nav text-white rounded-full shadow-lg transition-all ${muscleIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    ${muscleIndex === 0 ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-left text-xl"></i>
+                            </button>
+                            <button onclick="showDay('${dayId}', ${muscleIndex + 1})" 
+                                    class="pointer-events-auto mr-4 p-3 arrow-nav text-white rounded-full shadow-lg transition-all ${muscleIndex === totalMuscles - 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    ${muscleIndex === totalMuscles - 1 ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-right text-xl"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                // Muscle indicators (dots)
+                let muscleIndicators = '';
+                if (totalMuscles > 1) {
+                    muscleIndicators = `
+                        <div class="flex justify-center space-x-2 mb-6">
+                            ${day.muscles.map((_, index) => `
+                                <button onclick="showDay('${dayId}', ${index})" 
+                                        class="w-3 h-3 rounded-full transition-all ${index === muscleIndex ? 'bg-white' : 'bg-white bg-opacity-40'}">
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                
+                const borderColors = {
+                    'gluteo': 'border-orange-500',
+                    'pierna': 'border-blue-500',
+                    'abs': 'border-pink-500',
+                    'biceps': 'border-green-500',
+                    'pecho': 'border-red-500',
+                    'espalda': 'border-teal-500'
+                };
+                
+                const exerciseList = currentMuscle.exercises.map(ex => 
+                    `<li class="exercise-li cursor-pointer hover:bg-gray-100 p-1 rounded transition-all" onclick="toggleExercise(this)">• ${ex}</li>`
+                ).join('');
+                
+                const muscleSection = `
+                    <div class="exercise-item p-3 md:p-4 rounded-lg border-l-4 ${borderColors[currentMuscle.class] || 'border-gray-500'}">
+                        <h3 class="font-semibold text-white text-base md:text-lg">${currentMuscle.name}</h3>
+                        <ul class="text-xs md:text-sm text-gray-300 mt-2 space-y-1">
+                            ${exerciseList}
+                        </ul>
+                    </div>
+                `;
+                
+                // Generate muscle summary for the day
+                const muscleSummary = `
+                    <div class="mb-4 text-gray-300 text-sm font-medium">
+                        Músculos del día: ${day.muscles.map(m => m.name).join(', ')}
+                    </div>
+                `;
+
+                content = `
+                    <div class="day-card workout-day rounded-xl shadow-lg p-4 md:p-6 lg:p-8 relative">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl md:text-2xl lg:text-3xl font-bold text-white">${day.name}</h2>
+                            <i class="fas ${day.icon} ${day.iconColor} text-xl md:text-2xl lg:text-3xl"></i>
+                        </div>
+                        
+                        ${muscleIndicators}
+                        ${navigation}
+                        
+                        <div class="mb-4">
+                            <span class="muscle-badge ${currentMuscle.class}">${currentMuscle.name}</span>
+                        </div>
+                        
+                        ${muscleSummary}
+                        
+                        <div class="space-y-3">
+                            ${muscleSection}
+                        </div>
+                        
+                        ${totalMuscles > 1 ? `
+                            <div class="mt-4 pt-4 border-t border-gray-600">
+                                <div class="text-center text-gray-400 text-xs">
+                                    Músculo ${muscleIndex + 1} de ${totalMuscles}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${arrowNavigation}
+                    </div>
+                `;
+            }
+            
+            display.innerHTML = content;
+            
+            // Function to toggle individual exercise completion
+            window.toggleExercise = function(element) {
+                element.style.opacity = element.style.opacity === '0.5' ? '1' : '0.5';
+                element.style.textDecoration = element.style.textDecoration === 'line-through' ? 'none' : 'line-through';
+                element.style.backgroundColor = element.style.backgroundColor === 'rgb(229, 231, 235)' ? '' : 'rgb(229, 231, 235)';
+            };
+            
+            // Re-add click handlers for exercise items (for the whole muscle section)
+            const exerciseItems = display.querySelectorAll('.exercise-item');
+            exerciseItems.forEach(item => {
+                item.style.cursor = 'pointer';
+                item.addEventListener('click', function(e) {
+                    // Only toggle if clicking on the header, not on individual exercises
+                    if (e.target.tagName === 'H3' || e.target.classList.contains('exercise-item')) {
+                        this.style.opacity = this.style.opacity === '0.5' ? '1' : '0.5';
+                        this.style.textDecoration = this.style.textDecoration === 'line-through' ? 'none' : 'line-through';
+                    }
+                });
+            });
+        }
+
+        // Initialize with current day
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().getDay();
+            const dayMap = { 1: 'lunes', 2: 'martes', 3: 'miercoles', 4: 'jueves', 5: 'viernes', 6: 'sabado', 0: 'domingo' };
+            const currentDay = dayMap[today] || 'lunes';
+            
+            showDay(currentDay);
+        });
+    </script>
+</body>
+</html>
